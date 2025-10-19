@@ -12,6 +12,32 @@
     <link href="https://fonts.googleapis.com/css2?family=Ojuju:wght@200..800&display=swap" rel="stylesheet">
 </head>
 <body>
+    <header class="main-header">
+        <div id="banner-carousel">
+            <div class="carousel-slide active"></div>
+            <div class="carousel-slide"></div>
+        </div>
+
+        <div class="header-content container">
+            <div class="header-top">
+                <h1>Filmera - Find Your Next Favorite Movie</h1>
+                <nav>
+                    <button id="nav-link" data-view="watchlist">My Watchlist</button>
+                </nav>
+            </div>
+
+            <form id="search-form">
+                <div class="search-input-wrapper">
+                    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                    </svg>
+                    <input type="text" id="search-input" placeholder="Search for a movie..." aria-label="Search movies" required />
+                </div>
+                <button type="submit" class="search-button">Search</button>
+            </form>
+        </div>
+    </header>
+
     
 </body>
 </html>
