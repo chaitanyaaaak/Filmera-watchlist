@@ -1,6 +1,10 @@
 :root {
     --bg-color: linear-gradient(315deg, #130f40 0%, #000000 74%);
     --text-color: #FFFFFF;
+    --text-secondary-color: #A5A5A5;
+    --primary-color: #4A4E74;
+    --surface-color: #1E1E1E;
+    --border-color: #424040;
 }
 
 * {
@@ -105,4 +109,62 @@ button {
 #nav-link:hover {
     background-color: rgba(255, 255, 255, 0.2);
 }
+
+/* search form */
+#search-form {
+    margin-top: 24px;
+    display: flex;
+    border-radius: 8px;
+    box-shadow: 0 4px 3px rgba(0,0,0,0.4);
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+}
+
+.search-input-wrapper {
+    position: relative;
+    flex-grow: 1;
+}
+
+.search-icon {       
+    position: absolute;
+    top: 50%;
+    left: 16px;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    color: var(--text-secondary-color);
+}
+
+#search-input {
+    width: 99.8%;
+    background: transparent;
+    padding: 12px 16px 12px 44px;
+    border: none;
+    border-radius: 8px 5px 5px 8px;
+    font-size: 0.95rem;
+}
+
+#search-input::placeholder {
+    color: var(--text-secondary-color);
+}
+
+#search-input:focus {
+    outline: none;
+    box-shadow: 0 0 1px 1px var(--text-color);
+}
+
+.search-button {
+    background-color: var(--primary-color);
+    padding: 12px 24px;
+    border-radius: 0 8px 8px 0;
+    color: var(--text-color);
+    font-size: 0.95rem;
+    transition: background-color 0.3s ease, opacity 0.3s ease;
+}
+
+.search-button:hover {
+    opacity: 0.8;
+}
+
+
 
