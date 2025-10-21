@@ -47,8 +47,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const query = searchInput.value.trim();
         console.log(query);
         if (query === '') return;
+
+        try {
+            const response = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDb_API_KEY}&query=${encodeURIComponent(query)}`);
+            const data = await response.json();
+            // console.log(data);
+            if (data.results && data.results.length > 0) {
+                const movieDetails = data.results.slice(0, 5).map(movie => fetch(`https://api.themoviedb.org/3/movie/${movie.id}?api_key=${TMDb_API_KEY}`).then(res => res.json()));
+                
+                const moviesWithDetails = await Promise.all(movieDetails);
+                console.log(moviesWithDetails);
+            } else {
+                
+            }
+        } catch (error) {
+            console.error('Error searching for movies:', error);
+        }
     }
- 
     searchForm.addEventListener('submit', handleSearch);
 
 
