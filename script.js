@@ -46,19 +46,19 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const query = searchInput.value.trim();
         console.log(query);
-        if (query === '') return;
+        if (!query) return;
 
         try {
-            const response = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDb_API_KEY}&query=${encodeURIComponent(query)}`);
+            const response = await fetch(`https://www.omdbapi.com/?s=${query}&apikey=${OMDb_API_KEY}`);
             const data = await response.json();
-            // console.log(data);
-            if (data.results && data.results.length > 0) {
-                const movieDetails = data.results.slice(0, 5).map(movie => fetch(`https://api.themoviedb.org/3/movie/${movie.id}?api_key=${TMDb_API_KEY}`).then(res => res.json()));
+            console.log(data);
+            if (data.Response === "True") {
+                const movieDetailsPromises = data.Search.map(movie => fetch(`https://www.omdbapi.com/?i=${movie.imdbID}&apikey=${OMDb_API_KEY}`).then(res => res.json()));
+                const movieWithDetails = await Promise.all(movieDetailsPromises);
+                console.log(movieWithDetails); 
                 
-                const moviesWithDetails = await Promise.all(movieDetails);
-                console.log(moviesWithDetails);
             } else {
-                
+                console.log('No movies found for the search query.');
             }
         } catch (error) {
             console.error('Error searching for movies:', error);
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     searchForm.addEventListener('submit', handleSearch);
 
-
+   
 
 
  
