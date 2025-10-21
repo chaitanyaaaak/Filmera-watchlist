@@ -42,9 +42,14 @@ document.addEventListener('DOMContentLoaded', () => {
         nextSlide.classList.add('active');
     }
 
-    
-
-
+    async function handleSearch(e) {
+        e.preventDefault();
+        const query = searchInput.value.trim();
+        console.log(query);
+        if (query === '') return;
+    }
+ 
+    searchForm.addEventListener('submit', handleSearch);
 
 
 
