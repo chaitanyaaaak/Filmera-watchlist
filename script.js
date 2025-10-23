@@ -54,6 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log(query);
         if (!query) return;
 
+        renderSkeletonLoader(6);    
         try {
             const response = await fetch(`https://www.omdbapi.com/?s=${encodeURIComponent(query)}&apikey=${OMDb_API_KEY}`);
             const data = await response.json();
@@ -94,6 +95,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div> 
                         <p class="movie-plot">${movie.Plot !== 'N/A' ? movie.Plot.substring(0, 150) + '...' : ""}</p>
                     </div>
+                    <div class="movie-actions">
+                        <button class="action-btn add-btn" data-movie-id="${movie.imdbID}"> 
+                        </button>
+                    </div>
                 </div>
             </div>`;
    }
@@ -110,10 +115,10 @@ document.addEventListener('DOMContentLoaded', () => {
      
     contentArea.innerHTML = `<div class="movie-grid">${moviesHTML}</div>`;
    }
-    fetchBannerMovies();
 
     // Display popular movies on load
    async function displayPopularMovies() {
+        renderSkeletonLoader(15);
         try {
             const response = await fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${TMDb_API_KEY}&language=en-US&page=1`);
             const data = await response.json();
@@ -128,7 +133,6 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error fetching popular movies:', error);
         }
    }
-    displayPopularMovies();
 
     // TMDb movie HTML template
     function getMovieHTML_TMDb(movie) {
@@ -162,5 +166,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>`;
     }
-    getMovieHTML_TMDb(movie);
+
+    function renderSkeletonLoader(count = 3) {
+        let skeletonHTML = '';
+        for (let i = 0; i < count; i++) {
+            skeletonHTML += `
+                <div class="movie-card">
+                    <div class="skeleton skeleton-poster"></div>
+                    <div class="skeleton-details">
+                        <div>
+                            <div class="skeleton skeleton-title"></div>
+                            <div class="skeleton skeleton-meta"></div>
+                            <div class="skeleton skeleton-plot"></div>
+                        </div>
+                        <div class="skeleton skeleton-button"></div>
+                    </div>
+                </div> `;
+        }
+        contentArea.innerHTML = `<div class="movie-grid">${skeletonHTML}</div>`
+    }
+
+    function init() {
+        fetchBannerMovies();
+        displayPopularMovies();
+
+    }
+
+    init();
 });
