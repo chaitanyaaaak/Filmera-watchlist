@@ -14,7 +14,7 @@
 }
 
 body {
-    font-family: "Trykker", serif;
+    /* font-family: "Trykker", serif; */
     background: var(--bg-color)
     color: var(--text-color); 
     overflow-x: hidden;
@@ -42,7 +42,7 @@ button {
     position: relative;
     color: var(--text-color);
     overflow: hidden;
-    background: var(--bg-color);
+    /* background: var(--bg-color); */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
 }
 
@@ -75,7 +75,7 @@ button {
     background-size: cover;
     background-position: center center;
     opacity: 0;
-    transition: opacity 0.5s ease-in-out;
+    transition: opacity 0.8s ease-in-out;
     z-index: 1;
 }
 
@@ -112,9 +112,9 @@ button {
 
 /* search form */
 #search-form {
-    margin-top: 24px;
+    margin-top: 55px;
     display: flex;
-    border-radius: 8px;
+    border-radius: 16px;
     box-shadow: 0 4px 3px rgba(0,0,0,0.4);
     background-color: var(--surface-color);
     border: 1px solid var(--border-color);
@@ -136,11 +136,12 @@ button {
 }
 
 #search-input {
-    width: 99.8%;
+    width: 100%;
+    color: var(--text-color);
     background: transparent;
     padding: 12px 16px 12px 44px;
     border: none;
-    border-radius: 8px 5px 5px 8px;
+    border-radius: 16px 0px 0px 16px;
     font-size: 0.95rem;
 }
 
@@ -165,6 +166,173 @@ button {
 .search-button:hover {
     opacity: 0.8;
 }
+
+/* main content and movie grid */
+#content-area {
+    padding: 24px 0;
+}
+
+.movie-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+}
+
+/* movie card styles */
+.movie-card {
+    background-color: var(--surface-color);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    gap: 16px;
+    padding: 16px;
+    transition: transform 0.5s ease;
+}
+
+.movie-card:hover {
+    transform: scale(1.05);
+}
+
+.movie-poster-wrapper {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.movie-poster {
+    width: 96px;
+    height: 144px;
+    object-fit: cover;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.movie-details {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-grow: 1;
+}
+
+.movie-title-rating {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;   
+}
+
+.movie-title {
+    font-size: 1.125rem;
+    color: var(--text-color);
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.movie-year {
+    font-size: 0.875rem;
+    color: var(--text-secondary-color);
+    font-weight: 500;
+}
+
+.movie-rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.875rem;
+    color: #FFD700;
+    flex-shrink: 0;
+}
+
+.movie-rating svg {
+    width: 16px;
+    height: 16px;
+}
+
+.movie-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    font-size: 0.75rem;
+    color: var(--text-secondary-color);
+    margin-top: 8px;
+}
+
+.movie-plot {
+    margin-top: 12px;
+    line-height: 1.4;
+    color: #d1d5db;
+    font-size: 0.875rem;
+}
+
+/* skeleton loader  */
+.skeleton {
+    background-color: var(--surface-color);
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.skeleton::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -150%;
+    height: 100%;
+    width: 150%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    100% {
+        left: 100%;
+    }
+}
+
+.skeleton-poster {
+    width: 96px;
+    height: 144px;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.skeleton-details {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.skeleton-title {
+    height: 20px;
+    width: 75%;
+}
+
+.skeleton-meta {
+    height: 20px;
+    width: 50%;
+    margin-top: 8px;
+}
+
+.skeleton-plot {
+    height: 48px;
+    width: 100%;
+    margin-top: 12px;
+}
+
+.skeleton-button {
+    height: 32px;
+    width: 112px;
+    border-radius: 100px;
+    margin-top: 12px;
+}
+
+
+
+
+
 
 
 
