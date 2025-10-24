@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('search-input');  
     const carouselSlides = document.querySelectorAll('.carousel-slide');
     const contentArea = document.getElementById('content-area');
+    const pageTitle = document.getElementById('page-title');
 
     let bannerMovies = [];
     let watchList = [];
@@ -96,8 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <p class="movie-plot">${movie.Plot !== 'N/A' ? movie.Plot.substring(0, 150) + '...' : ""}</p>
                     </div>
                     <div class="movie-actions">
-                        <button class="action-btn add-btn" data-movie-id="${movie.imdbID}"> 
-                        </button>
+                        <button class="action-btn" data-movie-id="${movie.imdbID}">Add to Watchlist</button>
                     </div>
                 </div>
             </div>`;
@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${TMDb_API_KEY}&language=en-US&page=1`);
             const data = await response.json();
-            console.log(data);
+            // console.log(data);
 
             if (data.results && data.results.length > 0) {
                 const popularMoviesPromises = data.results.slice(0, 15).map(movie => fetch(`https://api.themoviedb.org/3/movie/${movie.id}?api_key=${TMDb_API_KEY}`).then(res => res.json()));
@@ -161,7 +161,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span>${runtime}</span>
                             <span>${genres}</span>
                         </div> 
-                        <p class="movie-plot">${movie.overview ? movie.overview.substring(0, 150) + '...' : ""}</p>
+                        <p class="movie-plot">${movie.overview ? movie.overview.substring(0, 100) + '...' : ""}</p>
+                    </div>
+                    <div class="movie-actions">
+                        <button class="action-btn" data-movie-id="${movie.imdbID}">Add to Watchlist</button>
                     </div>
                 </div>
             </div>`;
@@ -186,10 +189,33 @@ document.addEventListener('DOMContentLoaded', () => {
         contentArea.innerHTML = `<div class="movie-grid">${skeletonHTML}</div>`
     }
 
+    function handleNavigation() {
+        const targetView = navLink.dataset.view;
+        if (targetView === 'watchlist') {
+            currentView = 'watchlist';
+            pageTitle.textContent = 'My Watchlist';
+            navLink.textContent = 'Search Movies';
+            navLink.dataset.view = 'search';
+            searchForm.classList.add('hidden');
+        } else {
+            currentView = 'search';
+            pageTitle.textContent = 'Filmera';
+            navLink.textContent = 'My Watchlist';
+            navLink.dataset.view = 'watchlist';
+            searchForm.classList.remove('hidden');
+            displayPopularMovies();
+        }
+    }
+
+    function eventListeners() {
+        searchForm.addEventListener('submit', handleSearch);
+        navLink.addEventListener('click', handleNavigation);
+    }
+
     function init() {
         fetchBannerMovies();
+        eventListeners();
         displayPopularMovies();
-
     }
 
     init();
