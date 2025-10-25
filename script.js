@@ -262,7 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return `
             <div class="movie-card ${watchedClass}" data-movie-id="${movie.imdbID}" style="--animation-delay: ${index * 200}ms;">
                 <div class="movie-poster-wrapper movie-card-clickable" data-imdb-id="${movie.imdbID}">
-                    <img src="${movie.Poster !== 'N/A' ? movie.Poster : './placeholder.svg'}" alt="${movie.Title}" class="movie-poster"/>
+                    <img src="${movie.Poster !== 'N/A' ? movie.Poster : './assets/placeholder.svg'}" alt="${movie.Title}" class="movie-poster"/>
                 </div>
                 <div class="movie-details">
                     <div>
@@ -315,7 +315,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const isAlreadyInWatchlist = watchlist.some(m => m.imdbID === movie.imdb_id);
         
-        const posterPath = movie.poster_path ? `${IMAGE_BASE_URL}w200${movie.poster_path}` : './placeholder.svg';
+        const posterPath = movie.poster_path ? `${IMAGE_BASE_URL}w200${movie.poster_path}` : './assets/placeholder.svg';
         const releaseYear = movie.release_date ? movie.release_date.substring(0, 4) : 'N/A';
         const genres = movie.genres ? movie.genres.map(genre => genre.name).join(', ') : 'N/A';
         const runtime = movie.runtime ? `${movie.runtime} min` : 'N/A';
