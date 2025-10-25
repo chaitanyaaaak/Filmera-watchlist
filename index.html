@@ -9,7 +9,8 @@
     <link rel="icon" type="image/png" href="./favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Ojuju:wght@200..800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bungee+Spice&family=Libertinus+Mono&display=swap" rel="stylesheet">
+
 </head>
 <body>
     <header class="main-header">
@@ -20,12 +21,13 @@
 
         <div class="header-content container">
             <div class="header-top">
-                <h1>Filmera - Find Your Next Favorite Movie</h1>
+                <h1 id="page-title">Filmera</h1>
                 <nav>
                     <button id="nav-link" data-view="watchlist">My Watchlist</button>
                 </nav>
             </div>
-
+        
+           
             <form id="search-form">
                 <div class="search-input-wrapper">
                     <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -39,15 +41,16 @@
     </header>
 
     <main class="container">
-        <div class="content-area"></div>
+        <div id="content-area"></div>
     </main>
-    
+
     <div id="toast-container"></div>
 
     <div id="movie-modal" class="hidden">
         <div id="modal-content"></div>
     </div>
 
+    <script src="config.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
