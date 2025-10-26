@@ -418,8 +418,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!movie) {
             try {
-                const response = await fetch(`https://www.omdbapi.com/?apikey=${OMDb_API_KEY}&i=${imdbId}&plot=full`);
-                movie = await response.json();
+                movie = await fetchFromApiProxy('getMovieDetailsByOMDb', { id: imdbId });
                 if (movie.Response !== 'True') {
                     showToast('Could not fetch movie details.', 'error');
                     return;
