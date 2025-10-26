@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/';
+    const API_PROXY_URL = './netlify/functions/fetch-movie';
  
     // DOM Elements
     const navLink = document.getElementById('nav-link');
@@ -18,7 +19,30 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentView = 'search'; 
     let currentBannerIndex = 0;
     let bannerInterval;
-    
+
+    async function fetchFromApiProxy(action, params = {}) {
+        try {
+            const response = await fetch(API_PROXY_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }, 
+                body: JSON.stringify({action, ...params}),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || `HTTP error status: ${response.status}`);
+            }
+            return await response.json();
+        } catch (error) {
+            console.error(`Error in API proxy for action ${action}:`, error);
+            showToast(`Error: ${error.message}`, 'error');
+            throw error;
+        }
+    }
+
+    // Initialization
     function init() {
         fetchBannerMovies();
         displayPopularMovies();
@@ -29,9 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // carousel (tmdb)
     async function fetchBannerMovies() {
         try {
-            const response = await fetch(`https://api.themoviedb.org/3/movie/now_playing?api_key=${TMDb_API_KEY}&language=en-US&page=1`);
-            const data = await response.json();
-            // console.log(data);
+            // const response = await fetch(`https://api.themoviedb.org/3/movie/now_playing?api_key=${TMDb_API_KEY}&language=en-US&page=1`);
+            const data = await fetchFromApiProxy('getBanners');
             bannerMovies = data.results.filter(movie => movie.backdrop_path).slice(0, 18);
             if (bannerMovies.length > 0 ) startBannerCarousel();
         } catch (error) {
@@ -61,14 +84,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Display popular movies on load
    async function displayPopularMovies() {
-        renderSkeletonLoader(15);
+        renderSkeletonLoader(10);
         try {
-            const response = await fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${TMDb_API_KEY}&language=en-US&page=1`);
-            const data = await response.json();
+            // const response = await fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${TMDb_API_KEY}&language=en-US&page=1`);
+            const data = await fetchFromApiProxy('getPopularMovies');
             // console.log(data);
  
             if (data.results && data.results.length > 0) {
-                const popularMoviesPromises = data.results.slice(0, 15).map(movie => fetch(`https://api.themoviedb.org/3/movie/${movie.id}?api_key=${TMDb_API_KEY}`).then(res => res.json()));
+                const popularMoviesPromises = data.results.slice(0, 15).map(movie => fetchFromApiProxy('getMovieDetailsByTMDb', { id: movie.id }));
                 const popularMovies = await Promise.all(popularMoviesPromises);
                 renderMovies(popularMovies, 'tmdb');
             } else {
@@ -89,13 +112,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         renderSkeletonLoader(6);    
         try {
-            const response = await fetch(`https://www.omdbapi.com/?s=${encodeURIComponent(query)}&apikey=${OMDb_API_KEY}`);
-            const data = await response.json();
-            // console.log(data);
+            const data = await fetchFromApiProxy('searchMovies', { query });
             if (data.Response === "True") {
-                const movieDetailsPromises = data.Search.slice(0, 8).map(movie => fetch(`https://www.omdbapi.com/?i=${movie.imdbID}&apikey=${OMDb_API_KEY}`).then(res => res.json()));
+                const movieDetailsPromises = data.Search.slice(0, 8).map(movie => fetchFromApiProxy('getMovieDetailsByOMDb', { id: movie.imdbID }));
                 const movieWithDetails = await Promise.all(movieDetailsPromises);
-                // console.log(movieWithDetails); 
                 renderMovies(movieWithDetails); 
             } else {
                 renderPlaceholder('no-results', 'Unable to find what you’re looking for.', 'Please try another search.');
@@ -156,17 +176,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // My watchlist logic
-
     async function addToWatchlist(imdbId) {
         try {
-            const response = await fetch(`https://www.omdbapi.com/?apikey=${OMDb_API_KEY}&i=${imdbId}`);
-            const movieData = await response.json();
+            // const response = await fetch(`https://www.omdbapi.com/?apikey=${OMDb_API_KEY}&i=${imdbId}`);
+            const movieData = await fetchFromApiProxy('getMovieDetailsByOMDb', { id: imdbId });
 
             if (movieData.Response === 'True') {
                 movieData.isWatched = false;
                 movieData.rating = null;
                 movieData.notes = '';
-                watchlist.push(movieData);
+                watchlist.unshift(movieData);
                 saveWatchlist();
                 showToast(`${movieData.Title} added to your watchlist!`, 'success');
             
