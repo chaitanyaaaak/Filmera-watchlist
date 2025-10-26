@@ -10,7 +10,7 @@ export const handler = async function(event, context) {
 
     const headers = {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': 'https://filmera-watchlist.netlify.app/',
+        'Access-Control-Allow-Origin': 'https://filmera-watchlist.netlify.app',
         'Access-Control-Allow-Headers': 'Content-Type',
     };
 
