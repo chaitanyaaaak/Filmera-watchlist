@@ -31,8 +31,14 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || `HTTP error status: ${response.status}`);
+                let errMsg = `HTTP error! status: ${response.status}`;
+                try {
+                    const errorData = await response.json();
+                    errMsg = errorData.error || errMsg;
+                } catch {
+                    // Ignore JSON parse errors
+                }
+                throw new Error(errMsg);
             }
             return await response.json();
         } catch (error) {
