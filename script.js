@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/';
-    const API_PROXY_URL = './netlify/functions/fetch-movie';
+    const API_PROXY_URL = '/.netlify/functions/fetch-movie';
  
     // DOM Elements
     const navLink = document.getElementById('nav-link');
