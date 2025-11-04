@@ -716,6 +716,21 @@ button {
     }
 }
 
+@media(min-width: 900px) {
+    #page-title {
+        font-size: 2.25rem;
+        letter-spacing: 3px;
+    } 
+
+    .movie-poster-wrapper {
+        max-width: 120px;
+    }
+
+    #content-area {
+        padding: 24px 0;
+    }
+}
+
 
 
 
