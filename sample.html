@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Watchlist</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* --- CSS VARIABLES & RESET --- */
+        :root {
+            --bg-color: linear-gradient(315deg, #130f40 0%, #000000 74%);;
+            --surface-color: #1E1E1E;
+            --primary-color: #4A4E74;
+            --text-color: #FFFFFF;
+            --text-secondary-color: #A5A5A5;
+            --accent-color: #FEC654;
+            --border-color: #2C2C2C;
+            --success-color: #16a34a;
+            --error-color: #dc2626;
+            --info-color: #2563eb;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+
+        button {
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+        
+        /* --- UTILITY CLASSES --- */
+        .hidden {
+            display: none !important;
+        }
+        
+        .container {
+            max-width: 1024px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        
+        /* --- HEADER & CAROUSEL --- */
+        .main-header {
+            color: white;
+            position: relative;
+            overflow: hidden;
+            background-color: black;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        #banner-carousel {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #banner-carousel::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.6));
+            z-index: 1;
+        }
+
+        .carousel-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center center;
+            opacity: 0;
+            transition: opacity 0.7s ease-in-out;
+            z-index: 1;
+        }
+
+        .carousel-slide.active {
+            opacity: 1;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 2;
+            padding: 32px 24px;
+        }
+        
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        #page-title {
+            font-size: 2.25rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+        }
+        
+        #nav-link {
+            font-size: 0.875rem;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        #nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* --- SEARCH FORM --- */
+        #search-form {
+            margin-top: 24px;
+            display: flex;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            flex-grow: 1;
+        }
+
+        .search-icon {
+            position: absolute;
+            top: 50%;
+            left: 12px;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            color: var(--text-secondary-color);
+        }
+
+        #search-input {
+            width: 100%;
+            background: transparent;
+            padding: 12px 12px 12px 40px;
+            color: white;
+            border: none;
+            outline: none;
+            border-radius: 6px 0 0 6px;
+        }
+        
+        #search-input:focus {
+             box-shadow: 0 0 0 2px var(--accent-color);
+        }
+
+        .search-button {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 700;
+            padding: 12px 24px;
+            border-radius: 0 6px 6px 0;
+            transition: background-color 0.3s ease;
+        }
+
+        .search-button:hover {
+            opacity: 0.8;
+        }
+        
+        /* --- MAIN CONTENT & MOVIE GRID --- */
+        #content-area {
+            padding: 24px 0;
+        }
+        
+        .movie-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        /* --- MOVIE CARD --- */
+        .movie-card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            gap: 16px;
+            padding: 16px;
+            transition: transform 0.3s ease;
+        }
+        
+        .movie-card:hover {
+             transform: scale(1.02);
+        }
+
+        .movie-poster-wrapper {
+            position: relative;
+            flex-shrink: 0;
+        }
+        
+        .movie-poster {
+            width: 96px;
+            height: 144px;
+            object-fit: cover;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .movie-details {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex-grow: 1;
+        }
+        
+        .movie-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        
+        .movie-year {
+            font-size: 0.875rem;
+            font-weight: 400;
+            color: var(--text-secondary-color);
+        }
+        
+        .movie-rating {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.875rem;
+            color: var(--accent-color);
+            flex-shrink: 0;
+        }
+        
+        .movie-rating svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .movie-meta {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 16px;
+            font-size: 0.75rem;
+            color: var(--text-secondary-color);
+            margin-top: 4px;
+        }
+        
+        .movie-plot {
+            font-size: 0.875rem;
+            color: #d1d5db; /* Light gray */
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+        
+        .movie-actions {
+            margin-top: 12px;
+        }
+
+        .action-btn {
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 9999px;
+            transition: background-color 0.3s ease;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary-color);
+        }
+        
+        .action-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .action-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .add-btn[disabled] {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary-color);
+        }
+        
+        /* --- WATCHLIST SPECIFIC STYLES --- */
+        .watchlist-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .watched-toggle {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary-color);
+        }
+
+        .watched-toggle.watched {
+            background-color: rgba(22, 163, 74, 0.2);
+            color: #6ee7b7; /* Emerald-300 */
+        }
+        
+        .remove-btn {
+            background-color: rgba(220, 38, 38, 0.2);
+            color: #fca5a5; /* Red-300 */
+        }
+
+        .remove-btn:hover {
+             background-color: rgba(220, 38, 38, 0.3);
+        }
+        
+        .watched-movie {
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+        }
+        
+        /* .watched-movie .movie-poster::after {
+            content: 'WATCHED';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            background-color: rgba(0,0,0,0.7);
+            color: var(--accent-color);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            font-size: 1.25rem;
+            letter-spacing: 2px;
+        } */
+
+        .watched-movie .movie-poster {
+    opacity: 0.4;
+    filter: grayscale(80%);
+    transition: all 0.3s ease;
+}
+
+.watched-movie .movie-poster-wrapper::after {
+    content: 'WATCHED';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-20deg);
+    background-color: rgba(255, 255, 255, 0.95);
+    color: #111;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-align: center;
+    border: 2px solid rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    
+    /* This is the key change: */
+    opacity: 0;
+    
+    /* Make it invisible to clicks */
+    pointer-events: none; 
+    
+    /* Add a transition for the fade-in */
+    transition: opacity 0.3s ease;
+}
+
+.watched-movie:hover .movie-poster-wrapper::after {
+    opacity: 1;
+}
+
+/* 4. (Optional but nice) This rule makes the poster
+     get a little brighter on hover, so the stamp stands out.
+*/
+.watched-movie:hover .movie-poster {
+    opacity: 0.6;
+    filter: grayscale(40%);
+}
+        
+        /* --- MODAL --- */
+        #movie-modal {
+            position: fixed;
+            inset: 0;
+            width: 100%;    
+            height: 100%;
+            opacity: 0;
+            pointer-events: none;
+            background-color: rgba(0, 0, 0, 0.75);
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        #movie-modal.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        #modal-content {
+            background-color: var(--surface-color);
+            border-radius: 8px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+
+        #movie-modal:not(.hidden) #modal-content {
+            transform: scale(1);
+        }
+        
+        .modal-body {
+            padding: 24px;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        
+        .close-modal-btn {
+            font-size: 1.5rem;
+            color: var(--text-secondary-color);
+            transition: color 0.3s ease;
+        }
+        
+        .close-modal-btn:hover {
+            color: var(--text-color);
+        }
+
+        /* Star Rating Styles */
+        .rating-group {
+    display: flex;
+    flex-direction: row-reverse; /* This flips the stars to 5,4,3,2,1 */
+    justify-content: flex-end;
+}
+
+/* This hides the radio buttons */
+.rating-group input { 
+    display: none; 
+}
+
+/* This styles the star <label>s */
+.rating-group label {
+    font-size: 1.75rem;
+    cursor: pointer;
+    color: #4b5563; /* Default "off" color (Gray-600) */
+    transition: color 0.2s ease-in-out;
+}
+
+/* --- THIS IS THE NEW LOGIC --- */
+
+/* 1. This rule colors the SAVED rating (the :checked star and all stars ~ before it) */
+.rating-group input:checked ~ label {
+    color: var(--accent-color);
+}
+
+/* 2. When you hover the group, this rule RESETS all stars to gray */
+.rating-group:hover label {
+    color: #4b5563; /* Gray-600 */
+}
+
+/* 3. This rule colors ONLY the stars you are hovering on (and all stars ~ before it) */
+.rating-group input:hover ~ label {
+    color: var(--accent-color);
+}
+
+        
+        /* --- TOAST NOTIFICATIONS --- */
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .toast {
+            color: white;
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 12px 16px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .toast.success { background-color: var(--success-color); }
+        .toast.error { background-color: var(--error-color); }
+        .toast.info { background-color: var(--info-color); }
+        
+        /* --- SKELETON LOADER --- */
+        .skeleton {
+            background-color: var(--surface-color);
+            position: relative;
+            overflow: hidden;
+            border-radius: 4px;
+        }
+        .skeleton::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -150%;
+            width: 150%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer {
+            100% { left: 150%; }
+        }
+
+        /* --- PLACEHOLDER --- */
+        .placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--text-secondary-color);
+            padding: 64px 0;
+        }
+        .placeholder svg {
+            width: 64px;
+            height: 64px;
+        }
+        .placeholder h2 {
+            margin-top: 16px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-secondary-color);
+        }
+        .placeholder p {
+            margin-top: 4px;
+            font-size: 0.875rem;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div id="banner-carousel">
+            <div class="carousel-slide active"></div>
+            <div class="carousel-slide"></div>
+        </div>
+        
+        <div class="header-content container">
+            <div class="header-top">
+                <h1 id="page-title">Find your film</h1>
+                <nav>
+                    <button id="nav-link" data-view="watchlist">My Watchlist</button>
+                </nav>
+            </div>
+            <form id="search-form">
+                <div class="search-input-wrapper">
+                    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                    </svg>
+                    <input type="text" id="search-input" placeholder="Search for a movie..." required>
+                </div>
+                <button type="submit" class="search-button">Search</button>
+            </form>
+        </div>
+    </header>
+
+    <main class="container">
+        <div id="content-area">
+            <!-- Dynamically populated content -->
+        </div>
+    </main>
+
+    <div id="toast-container"></div>
+
+    <div id="movie-modal" class="hidden">
+        <div id="modal-content">
+            <!-- Modal content injected here -->
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        // This script uses a HYBRID approach:
+        // 1. TMDb: For the header carousel and popular movies on load.
+        // 2. OMDb: For all user-initiated searches.
+
+document.addEventListener('DOMContentLoaded', () => {
+    // --- CONFIGURATION ---
+    // const TMDb_API_KEY = 'YOUR_TMDB_API_KEY_HERE'; // For banners & popular
+    // const OMDb_API_KEY = 'YOUR_OMDB_API_KEY_HERE'; // For search
+    const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/';
+
+    // --- DOM ELEMENTS ---
+    const searchForm = document.getElementById('search-form');
+    const searchInput = document.getElementById('search-input');
+    const contentArea = document.getElementById('content-area');
+    const pageTitle = document.getElementById('page-title');
+    const navLink = document.getElementById('nav-link');
+    const toastContainer = document.getElementById('toast-container');
+    const movieModal = document.getElementById('movie-modal');
+    const modalContent = document.getElementById('modal-content');
+    const carouselSlides = document.querySelectorAll('.carousel-slide');
+
+    // --- STATE MANAGEMENT ---
+    let watchlist = []; // This will ONLY store OMDb-formatted movie objects
+    let currentView = 'search';
+    let bannerMovies = [];
+    let currentBannerIndex = 0;
+    let bannerInterval;
+
+    // --- INITIALIZATION ---
+    function init() {
+        loadWatchlist();
+        setupEventListeners();
+        fetchAndDisplayPopularMovies(); // Show popular movies on load
+        fetchBannerMovies();
+        
+        if (!TMDb_API_KEY || TMDb_API_KEY === 'YOUR_TMDB_API_KEY_HERE') {
+            showToast('TMDb API key is missing. Banners and popular movies will not load.', 'error', 8000);
+        }
+        if (!OMDb_API_KEY || OMDb_API_KEY === 'YOUR_OMDB_API_KEY_HERE') {
+            showToast('OMDb API key is missing. Search will not work.', 'error', 8000);
+            if(currentView === 'search') {
+                 renderPlaceholder('api-key', 'OMDb API Key Needed', 'Get a free key from omdbapi.com to enable movie searching.');
+            }
+        }
+    }
+
+    // --- BANNER CAROUSEL (TMDb) ---
+    async function fetchBannerMovies() {
+        if (!TMDb_API_KEY || TMDb_API_KEY === 'YOUR_TMDB_API_KEY_HERE') return;
+        try {
+            const response = await fetch(`https://api.themoviedb.org/3/movie/now_playing?api_key=${TMDb_API_KEY}&language=en-US&page=1`);
+            const data = await response.json();
+            bannerMovies = data.results.filter(movie => movie.backdrop_path).slice(0, 10);
+            if (bannerMovies.length > 0) startBannerCarousel();
+        } catch (error) {
+            console.error('Failed to fetch banner movies:', error);
+        }
+    }
+
+    function startBannerCarousel() {
+        if (bannerMovies.length === 0) return;
+        carouselSlides[0].style.backgroundImage = `url(${IMAGE_BASE_URL}original${bannerMovies[0].backdrop_path})`;
+        if (bannerMovies.length > 1) {
+            bannerInterval = setInterval(changeBannerImage, 7000);
+        }
+    }
+
+    function changeBannerImage() {
+        currentBannerIndex = (currentBannerIndex + 1) % bannerMovies.length;
+        const activeSlide = document.querySelector('.carousel-slide.active');
+        const nextSlide = document.querySelector('.carousel-slide:not(.active)');
+        nextSlide.style.backgroundImage = `url(${IMAGE_BASE_URL}original${bannerMovies[currentBannerIndex].backdrop_path})`;
+        activeSlide.classList.remove('active');
+        nextSlide.classList.add('active');
+    }
+    
+    // --- POPULAR MOVIES (TMDb) ---
+    async function fetchAndDisplayPopularMovies() {
+        renderSkeletonLoader(10); 
+        if (!TMDb_API_KEY || TMDb_API_KEY === 'YOUR_TMDB_API_KEY_HERE') {
+            renderPlaceholder('api-key', 'TMDb API Key Needed', 'Get a free key from themoviedb.org to show popular movies.');
+            return;
+        }
+        
+        try {
+            const response = await fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${TMDb_API_KEY}&language=en-US&page=1`);
+            const data = await response.json();
+
+            if (data.results && data.results.length > 0) {
+                // We need to fetch details for each to get the all-important imdb_id
+                const movieDetailsPromises = data.results.slice(0, 10).map(movie => 
+                    fetch(`https://api.themoviedb.org/3/movie/${movie.id}?api_key=${TMDb_API_KEY}`).then(res => res.json())
+                );
+                const moviesWithDetails = await Promise.all(movieDetailsPromises);
+                // Filter out any movies that don't have an imdb_id (rare, but possible)
+                const validMovies = moviesWithDetails.filter(movie => movie.imdb_id);
+                renderMovies(validMovies, 'tmdb'); // <-- Specify 'tmdb'
+            } else {
+                renderPlaceholder('no-results', 'Could Not Load Popular Movies', 'Please try again later.');
+            }
+        } catch (error) {
+            console.error("Fetch Popular Movies Error:", error);
+            renderPlaceholder('error', 'Something went wrong.', 'Could not fetch movie data. Please check your connection and try again.');
+        }
+    }
+    
+    // --- SEARCH MOVIES (OMDb) ---
+    async function handleSearch(e) {
+        e.preventDefault();
+        const query = searchInput.value.trim();
+        if (!query) return;
+
+        if (!OMDb_API_KEY || OMDb_API_KEY === 'YOUR_OMDB_API_KEY_HERE') {
+            showToast('Cannot search without a valid OMDb API key.', 'error');
+            return;
+        }
+
+        renderSkeletonLoader(5);
+        try {
+            // 1. Search OMDb for a list of movies
+            const response = await fetch(`https://www.omdbapi.com/?apikey=${OMDb_API_KEY}&s=${encodeURIComponent(query)}`);
+            const data = await response.json();
+
+            if (data.Response === 'True' && data.Search) {
+                // 2. Fetch full details for each movie in the search results
+                const movieDetailsPromises = data.Search.slice(0, 10).map(movie => 
+                    fetch(`https://www.omdbapi.com/?apikey=${OMDb_API_KEY}&i=${movie.imdbID}`).then(res => res.json())
+                );
+                const moviesWithDetails = await Promise.all(movieDetailsPromises);
+                renderMovies(moviesWithDetails, 'omdb'); // <-- Specify 'omdb'
+            } else {
+                renderPlaceholder('no-results', 'Unable to find what you’re looking for.', 'Please try another search.');
+            }
+        } catch (error) {
+            console.error("Search Error:", error);
+            renderPlaceholder('error', 'Something went wrong.', 'Could not fetch movie data. Please check your connection and try again.');
+        }
+    }
+
+    // --- EVENT LISTENERS ---
+    function setupEventListeners() {
+        searchForm.addEventListener('submit', handleSearch);
+        navLink.addEventListener('click', handleNavigation);
+        document.body.addEventListener('click', handleDynamicClicks);
+    }
+
+    function handleDynamicClicks(e) {
+        // We now use imdbID as the standard for all movie IDs
+        const imdbId = e.target.closest('[data-movie-id]')?.dataset.movieId;
+        
+        if (e.target === movieModal || e.target.closest('.close-modal-btn')) {
+            closeMovieModal();
+            return;
+        }
+
+        if (!imdbId) return; // Exit if no movie ID is associated with the click
+
+        if (e.target.closest('.add-btn')) addToWatchlist(imdbId);
+        else if (e.target.closest('.remove-btn')) removeFromWatchlist(imdbId);
+        else if (e.target.closest('.watched-toggle')) toggleWatchedStatus(imdbId);
+        else if (e.target.closest('.movie-card-clickable')) openMovieModal(imdbId);
+        else if (e.target.closest('.save-rating-btn')) {
+            const rating = document.querySelector(`#modal-rating-${imdbId} input[type='radio']:checked`)?.value;
+            const notes = document.getElementById(`modal-notes-${imdbId}`).value;
+            updateMovieDetails(imdbId, rating ? parseInt(rating) : null, notes);
+            closeMovieModal();
+            showToast('Details saved successfully!', 'success');
+        }
+    }
+    
+    // --- VIEW & NAVIGATION ---
+    function handleNavigation() {
+        const targetView = navLink.dataset.view;
+        if (targetView === 'watchlist') {
+            currentView = 'watchlist';
+            pageTitle.textContent = 'My Watchlist';
+            navLink.textContent = 'Search for movies';
+            navLink.dataset.view = 'search';
+            searchForm.classList.add('hidden');
+            renderWatchlist();
+        } else {
+            currentView = 'search';
+            pageTitle.textContent = 'Find your film';
+            navLink.textContent = 'My Watchlist';
+            navLink.dataset.view = 'watchlist';
+            searchForm.classList.remove('hidden');
+            fetchAndDisplayPopularMovies(); // Show popular movies on search page
+        }
+    }
+
+    // --- WATCHLIST LOGIC ---
+    async function addToWatchlist(imdbId) {
+        if(watchlist.some(movie => movie.imdbID == imdbId)) {
+            showToast('This movie is already in your watchlist.', 'info');
+            return;
+        }
+        
+        try {
+            // **Standardization Step**
+            // No matter where it came from, fetch the definitive OMDb record
+            // to store in our watchlist.
+            const response = await fetch(`https://www.omdbapi.com/?apikey=${OMDb_API_KEY}&i=${imdbId}`);
+            const movieData = await response.json();
+            
+            if (movieData.Response === 'True') {
+                movieData.isWatched = false;
+                movieData.userRating = null;
+                movieData.userNotes = '';
+                
+                watchlist.push(movieData);
+                saveWatchlist();
+                showToast(`${movieData.Title} added to your watchlist!`, 'success');
+
+                // Update button on search page (if that's where we are)
+                if(currentView === 'search') {
+                    const button = document.querySelector(`.add-btn[data-movie-id="${imdbId}"]`);
+                    if (button) {
+                       button.innerHTML = `
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Added`;
+                       button.disabled = true;
+                    }
+                }
+            } else {
+               showToast('Could not fetch movie details to add.', 'error');
+            }
+        } catch (error) {
+            showToast('Error adding to watchlist.', 'error');
+        }
+    }
+
+    function removeFromWatchlist(imdbId) {
+        const movieTitle = watchlist.find(m => m.imdbID == imdbId)?.Title || 'Movie';
+        watchlist = watchlist.filter(movie => movie.imdbID != imdbId);
+        saveWatchlist();
+        showToast(`${movieTitle} removed from your watchlist.`, 'info');
+        if (currentView === 'watchlist') renderWatchlist();
+    }
+    
+    function toggleWatchedStatus(imdbId) {
+        const movie = watchlist.find(m => m.imdbID == imdbId);
+        if (movie) {
+            movie.isWatched = !movie.isWatched;
+            saveWatchlist();
+            showToast(`${movie.Title} marked as ${movie.isWatched ? 'watched' : 'unwatched'}.`, 'info');
+            if(currentView === 'watchlist') renderWatchlist();
+        }
+    }
+    
+    function updateMovieDetails(imdbId, rating, notes) {
+        const movie = watchlist.find(m => m.imdbID == imdbId);
+        if (movie) {
+            movie.userRating = rating;
+            movie.userNotes = notes;
+            saveWatchlist();
+            if(currentView === 'watchlist') renderWatchlist();
+        }
+    }
+
+    // --- LOCAL STORAGE ---
+    function saveWatchlist() {
+        // We always store our watchlist using the OMDb format.
+        localStorage.setItem('movieWatchlistHybrid', JSON.stringify(watchlist));
+    }
+
+    function loadWatchlist() {
+        const storedWatchlist = localStorage.getItem('movieWatchlistHybrid');
+        if (storedWatchlist) watchlist = JSON.parse(storedWatchlist);
+    }
+
+    // --- RENDERING ---
+    
+    /**
+     * Main render function. It now routes to the correct
+     * HTML generator based on the API source.
+     */
+    function renderMovies(movies, apiType) {
+        if (!movies || movies.length === 0) {
+             renderPlaceholder('no-results', 'No movies found.', 'Try a different search term.');
+             return;
+        }
+        
+        let moviesHtml = '';
+        if (apiType === 'tmdb') {
+            moviesHtml = movies.map(movie => getMovieHTML_TMDb(movie)).join('');
+        } else {
+            // 'omdb' or 'watchlist'
+            moviesHtml = movies.map(movie => getMovieHTML_OMDb(movie, false)).join('');
+        }
+        
+        contentArea.innerHTML = `<div class="movie-grid">${moviesHtml}</div>`;
+    }
+    
+    function renderWatchlist() {
+        if (watchlist.length > 0) {
+            // Our watchlist ONLY contains OMDb objects, so we always use the OMDb renderer.
+            const moviesHtml = watchlist.map(movie => getMovieHTML_OMDb(movie, true)).join('');
+            contentArea.innerHTML = `<div class="movie-grid">${moviesHtml}</div>`;
+        } else {
+            renderPlaceholder('empty-watchlist', 'Your watchlist is looking a little empty...', `
+                <button onclick="document.getElementById('nav-link').click()" style="color: var(--accent-color); font-weight: 700; display: flex; align-items: center; gap: 8px; margin-top: 8px;">
+                    <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                    Let’s add some movies!
+                </button>
+            `);
+        }
+    }
+
+    /**
+     * NEW: Generates HTML for a TMDb movie object
+     */
+    function getMovieHTML_TMDb(movie) {
+        // We use movie.imdb_id as the standard ID
+        const isAlreadyInWatchlist = watchlist.some(m => m.imdbID === movie.imdb_id); 
+        
+        const posterPath = movie.poster_path ? `${IMAGE_BASE_URL}w200${movie.poster_path}` : 'https://placehold.co/100x150/1E1E1E/FFFFFF?text=No+Image';
+        const releaseYear = movie.release_date ? movie.release_date.substring(0, 4) : 'N/A';
+        const rating = movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A';
+        const runtime = movie.runtime ? `${movie.runtime} min` : 'N/A';
+        const genres = movie.genres ? movie.genres.map(g => g.name).join(', ') : 'N/A';
+
+        return `
+            <div class="movie-card" data-movie-id="${movie.imdb_id}">
+                <div class="movie-poster-wrapper movie-card-clickable" data-movie-id="${movie.imdb_id}">
+                    <img src="${posterPath}" alt="${movie.title} poster" class="movie-poster">
+                </div>
+                <div class.movie-details">
+                    <div>
+                        <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;">
+                            <h3 class="movie-title movie-card-clickable" data-movie-id="${movie.imdb_id}">${movie.title} <span class="movie-year">(${releaseYear})</span></h3>
+                            <div class="movie-rating">
+                                <svg fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                                <span>${rating}</span>
+                            </div>
+                        </div>
+                        <div class="movie-meta">
+                            <span>${runtime}</span>
+                            <span>${genres}</span>
+                        </div>
+                        <p class="movie-plot">${movie.overview ? movie.overview.substring(0, 100) + '...' : ''}</p>
+                    </div>
+                    <div class="movie-actions">
+                         <button class="action-btn add-btn" data-movie-id="${movie.imdb_id}" ${isAlreadyInWatchlist ? 'disabled' : ''}>
+                            ${isAlreadyInWatchlist ? `
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            Added` : `
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                            Watchlist`}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    /**
+     * UPDATED: Generates HTML for an OMDb movie object (or a watchlist item)
+     */
+    function getMovieHTML_OMDb(movie, isWatchlist = false) {
+        // We use movie.imdbID as the standard ID
+        const isAlreadyInWatchlist = watchlist.some(m => m.imdbID === movie.imdbID);
+        const watchedClass = isWatchlist && movie.isWatched ? 'watched-movie' : '';
+        const posterPath = (movie.Poster && movie.Poster !== 'N/A') ? movie.Poster : 'https://placehold.co/100x150/1E1E1E/FFFFFF?text=No+Image';
+
+        return `
+            <div class="movie-card ${watchedClass}" data-movie-id="${movie.imdbID}">
+                <div class="movie-poster-wrapper movie-card-clickable" data-movie-id="${movie.imdbID}">
+                    <img src="${posterPath}" alt="${movie.Title} poster" class="movie-poster">
+                </div>
+                <div class="movie-details">
+                    <div>
+                        <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;">
+                            <h3 class="movie-title movie-card-clickable" data-movie-id="${movie.imdbID}">${movie.Title} <span class="movie-year">(${movie.Year})</span></h3>
+                            <div class="movie-rating">
+                                <svg fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                                <span>${movie.imdbRating || 'N/A'}</span>
+                            </div>
+                        </div>
+                        <div class="movie-meta">
+                            <span>${movie.Runtime || 'N/A'}</span>
+                            <span>${movie.Genre || 'N/A'}</span>
+                        </div>
+                        <p class="movie-plot">${movie.Plot ? movie.Plot.substring(0, 100) + '...' : ''}</p>
+                    </div>
+                    <div class="movie-actions">
+                        ${isWatchlist ? `
+                            <div class="watchlist-actions">
+                                <button class="action-btn watched-toggle ${movie.isWatched ? 'watched' : ''}" data-movie-id="${movie.imdbID}">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${movie.isWatched ? 'M5 13l4 4L19 7' : 'M15 12a3 3 0 11-6 0 3 3 0 016 0z'}"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${movie.isWatched ? '' : 'M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z'}"></path></svg>
+                                    <span>${movie.isWatched ? 'Watched' : 'Mark Watched'}</span>
+                                </button>
+                                <button class="action-btn remove-btn" data-movie-id="${movie.imdbID}">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    Remove
+                                </button>
+                            </div>
+                        `: `
+                            <button class="action-btn add-btn" data-movie-id="${movie.imdbID}" ${isAlreadyInWatchlist ? 'disabled' : ''}>
+                                ${isAlreadyInWatchlist ? `
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                Added` : `
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                                Watchlist`}
+                            </button>
+                        `}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderSkeletonLoader(count = 3) {
+        let skeletonHTML = '';
+        for (let i = 0; i < count; i++) {
+            skeletonHTML += `
+                <div class="movie-card">
+                    <div class="skeleton" style="width: 96px; height: 144px; flex-shrink: 0;"></div>
+                    <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; width: 100%;">
+                        <div>
+                            <div class="skeleton" style="height: 20px; width: 75%;"></div>
+                            <div class="skeleton" style="height: 16px; width: 50%; margin-top: 8px;"></div>
+                            <div class="skeleton" style="height: 48px; width: 100%; margin-top: 12px;"></div>
+                        </div>
+                        <div class="skeleton" style="height: 32px; width: 112px; border-radius: 9999px; margin-top: 12px;"></div>
+                    </div>
+                </div>`;
+        }
+        contentArea.innerHTML = `<div class="movie-grid">${skeletonHTML}</div>`;
+    }
+
+     function getPlaceholderHTML(type, title, subtitle = '') {
+        const icons = {
+            'no-results': `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`,
+            'empty-watchlist': `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path></svg>`,
+            'api-key': `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H5v-2H3v-2H1v-4a6 6 0 016-6h4a6 6 0 016 6z"></path></svg>`,
+            'error': `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`
+        };
+        return `<div class="placeholder">${icons[type] || ''}<h2>${title}</h2><p>${subtitle}</p></div>`;
+    }
+
+    function renderPlaceholder(type, title, subtitle) {
+        contentArea.innerHTML = getPlaceholderHTML(type, title, subtitle);
+    }
+
+    // --- MODAL ---
+    async function openMovieModal(imdbId) {
+        // Find in watchlist first, otherwise fetch from OMDb
+        let movie = watchlist.find(m => m.imdbID == imdbId);
+        
+        if (!movie) {
+             try {
+                const response = await fetch(`https://www.omdbapi.com/?apikey=${OMDb_API_KEY}&i=${imdbId}&plot=full`);
+                movie = await response.json();
+                if (movie.Response !== 'True') {
+                     showToast('Could not load movie details.', 'error');
+                     return;
+                }
+             } catch (error) {
+                 showToast('Error fetching movie details.', 'error');
+                 return;
+             }
+        }
+        
+        // We now know 'movie' is a valid OMDb object
+        const inWatchlist = watchlist.some(m => m.imdbID == imdbId);
+        
+        const ratingsHTML = [5, 4, 3, 2, 1].map(star => `
+            <input type="radio" id="star${star}-${movie.imdbID}" name="rating" value="${star}" ${movie.userRating === star ? 'checked' : ''} />
+            <label for="star${star}-${movie.imdbID}">★</label>
+        `).join('');
+
+        modalContent.innerHTML = `
+            <div class="modal-body">
+                <div class="modal-header">
+                     <h2 class="modal-title">${movie.Title}</h2>
+                     <button class="close-modal-btn">&times;</button>
+                </div>
+                <p style="font-size: 0.875rem; color: var(--text-secondary-color); margin-bottom: 16px;">${movie.Year} · ${movie.Rated} · ${movie.Runtime}</p>
+                <p style="margin-bottom: 16px;">${movie.Plot}</p>
+                <p style="font-size: 0.875rem;"><strong style="color: var(--text-secondary-color);">Genre:</strong> ${movie.Genre}</p>
+                <p style="font-size: 0.875rem;"><strong style="color: var(--text-secondary-color);">Director:</strong> ${movie.Director}</p>
+                <p style="font-size: 0.875rem; margin-bottom: 16px;"><strong style="color: var(--text-secondary-color);">Actors:</strong> ${movie.Actors}</p>
+                
+                ${inWatchlist ? `
+                    <div style="background-color: rgba(0,0,0,0.2); padding: 16px; border-radius: 8px; margin-top: 16px;">
+                       <h3 style="font-weight: 700; margin-bottom: 8px;">Your Rating & Notes</h3>
+                       <div id="modal-rating-${movie.imdbID}" class="rating-group" style="margin-bottom: 8px;">${ratingsHTML}</div>
+                       <textarea id="modal-notes-${movie.imdbID}" style="width: 100%; background-color: var(--bg-color); padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); color: white;" rows="3" placeholder="Add personal notes...">${movie.userNotes || ''}</textarea>
+                       <button class="save-rating-btn" data-movie-id="${movie.imdbID}" style="margin-top: 16px; width: 100%; background-color: var(--primary-color); color: white; font-weight: 700; padding: 8px 16px; border-radius: 6px;">Save Details</button>
+                    </div>
+                ` : `
+                   <p style="text-align: center; font-size: 0.875rem; color: var(--text-secondary-color); margin-top: 24px; background-color: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px;">Add this movie to your watchlist to rate it and add notes.</p>
+                `}
+            </div>
+        `;
+
+        movieModal.classList.add('visible');
+    }
+    
+    function closeMovieModal() {
+        movieModal.classList.remove('visible');
+        modalContent.innerHTML = '';
+    }
+
+    // --- UI HELPERS ---
+    function showToast(message, type = 'success', duration = 3000) {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+        toastContainer.appendChild(toast);
+
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 100);
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+            toast.addEventListener('transitionend', () => toast.remove());
+        }, duration);
+    }
+
+    // --- LET'S GO ---
+    init();
+});
+    
+
+        </script>
+</body>
+</html>
+
